@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+:root {
+  --color-background: #f7fafb;
+  --color-foreground: #0f2238;
+  --color-navy: #0b2a4a;
+  --color-navy-dark: #081c33;
+  --color-turquoise: #15b8b1;
+  --color-turquoise-light: #e3f7f6;
+  --color-pink: #f2a6b8;
+  --color-pink-light: #fcebef;
+  --color-muted: #5b6b7c;
+  --color-border: #e1e8ed;
+  --color-card: #ffffff;
+  --color-danger: #c0392b;
+}
+
+@theme inline {
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-navy: var(--color-navy);
+  --color-navy-dark: var(--color-navy-dark);
+  --color-turquoise: var(--color-turquoise);
+  --color-turquoise-light: var(--color-turquoise-light);
+  --color-pink: var(--color-pink);
+  --color-pink-light: var(--color-pink-light);
+  --color-muted: var(--color-muted);
+  --color-border: var(--color-border);
+  --color-card: var(--color-card);
+  --color-danger: var(--color-danger);
+  --font-sans: var(--font-cairo);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-cairo), "Segoe UI", Tahoma, sans-serif;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-turquoise);
+  outline-offset: 2px;
+}

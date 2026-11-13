@@ -158,7 +158,6 @@ export default function LeadForm() {
           <StepPackage
             data={data}
             onSelectPackage={(value: PackageId) => update("package", value)}
-            onSelectZone={(value) => update("singleZone", value)}
             error={stepError}
           />
         )}

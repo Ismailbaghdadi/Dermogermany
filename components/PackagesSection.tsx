@@ -26,6 +26,11 @@ export default function PackagesSection() {
                     {pkg.description}
                   </p>
                 )}
+                {pkg.sessions && (
+                  <p className="mt-1 text-xs font-bold text-navy/70 sm:text-sm">
+                    عدد الجلسات: {pkg.sessions}
+                  </p>
+                )}
               </div>
               <span
                 dir="ltr"

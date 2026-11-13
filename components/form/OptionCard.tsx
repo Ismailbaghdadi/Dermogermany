@@ -2,6 +2,7 @@ interface OptionCardProps {
   title: string;
   description?: string;
   price?: string;
+  sessions?: string;
   selected: boolean;
   onSelect: () => void;
 }
@@ -10,6 +11,7 @@ export default function OptionCard({
   title,
   description,
   price,
+  sessions,
   selected,
   onSelect,
 }: OptionCardProps) {
@@ -41,6 +43,11 @@ export default function OptionCard({
             {description && (
               <p className="mt-0.5 text-xs leading-relaxed text-muted sm:text-sm">
                 {description}
+              </p>
+            )}
+            {sessions && (
+              <p className="mt-0.5 text-xs font-bold text-navy/70 sm:text-sm">
+                عدد الجلسات: {sessions}
               </p>
             )}
           </div>

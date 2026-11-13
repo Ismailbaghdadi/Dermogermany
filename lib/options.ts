@@ -12,57 +12,57 @@ export interface Option<T extends string> {
   title: string;
   description?: string;
   price?: string;
+  sessions?: string;
 }
 
 export const PACKAGES: Option<PackageId>[] = [
-  { id: "single_zone", title: "منطقة واحدة", price: "1 000 درهم" },
+  {
+    id: "single_zone",
+    title: "جلسة واحدة – الجسم كامل",
+    description: "جلسة واحدة لإزالة الشعر بالليزر للجسم كامل.",
+    price: "1 000 درهم",
+    sessions: "جلسة واحدة",
+  },
   {
     id: "mini",
     title: "باقة ميني",
     description: "3 مناطق صغيرة من اختيارك",
     price: "1 900 درهم",
+    sessions: "7 جلسات",
   },
   {
     id: "duo",
     title: "باقة ديو",
-    description: "الإبطان + منطقة البكيني",
+    description: "الإبطان + منطقة البيكيني",
     price: "2 500 درهم",
+    sessions: "7 جلسات",
   },
   {
     id: "trio",
     title: "باقة تريو",
-    description: "الإبطان + منطقة البكيني + نصف الساقين",
+    description: "الإبطان + منطقة البيكيني + نصف الساقين",
     price: "3 900 درهم",
+    sessions: "7 جلسات",
   },
   {
     id: "silhouette",
     title: "باقة سيلويت",
-    description: "الإبطان + منطقة البكيني + الساقان كاملتان",
-    price: "4 900 درهم",
+    description: "الإبطان + منطقة البيكيني + الساقان كاملتان",
+    price: "4 700 درهم",
+    sessions: "7 جلسات",
   },
   {
     id: "full_body",
     title: "باقة الجسم كامل",
     description: "الجسم كامل",
-    price: "6 900 درهم",
+    price: "5 000 درهم",
+    sessions: "7 جلسات",
   },
 ];
 
 export const PACKAGE_FORM_OPTIONS: Option<PackageId>[] = [
   ...PACKAGES,
   { id: "unsure", title: "مازال ما عرفتش، بغيت ناخد نصيحة" },
-];
-
-export const SINGLE_ZONE_OPTIONS: string[] = [
-  "الوجه",
-  "الإبطان",
-  "الذراعان",
-  "منطقة البكيني",
-  "نصف الساقين",
-  "الساقان كاملتان",
-  "الظهر",
-  "البطن",
-  "منطقة أخرى",
 ];
 
 export const LOCATIONS: Option<LocationId>[] = [

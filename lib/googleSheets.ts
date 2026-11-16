@@ -1,20 +1,13 @@
 import "server-only";
-import { google } from "googleapis";
+import { google, sheets_v4 } from "googleapis";
 
 export const LEAD_SHEET_HEADERS = [
   "تاريخ ووقت الطلب",
   "الاسم",
   "رقم الهاتف",
-  "الباقة المختارة",
-  "اختيار المنطقة الواحدة، إلا كان مناسباً",
-  "الحي",
-  "وقت البدء",
-  "نية التواصل",
-  "القدرة على المجيء للسنتر",
-  "الوقت المناسب للاتصال",
-  "الموافقة على التواصل",
-  "حالة الطلب",
-  "سبب تصنيف الطلب",
+  "العرض المختار",
+  "الوقت المفضل للاتصال",
+  "مصدر الطلب",
   "مصدر الإعلان UTM",
   "الحملة الإعلانية",
   "الإعلان",
@@ -40,15 +33,36 @@ function getSheetsClient() {
   return google.sheets({ version: "v4", auth });
 }
 
+async function ensureSheetTabExists(
+  sheets: sheets_v4.Sheets,
+  spreadsheetId: string,
+  sheetName: string,
+): Promise<void> {
+  const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+  const exists = spreadsheet.data.sheets?.some(
+    (s) => s.properties?.title === sheetName,
+  );
+  if (exists) return;
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: {
+      requests: [{ addSheet: { properties: { title: sheetName } } }],
+    },
+  });
+}
+
 export async function appendLeadRow(row: string[]): Promise<void> {
   const spreadsheetId = process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
-  const sheetName = process.env.GOOGLE_SHEETS_SHEET_NAME || "Leads";
+  const sheetName = process.env.GOOGLE_SHEETS_SHEET_NAME || "WhatsAppLeads";
 
   if (!spreadsheetId) {
     throw new Error("GOOGLE_SHEETS_SPREADSHEET_ID is not configured.");
   }
 
   const sheets = getSheetsClient();
+
+  await ensureSheetTabExists(sheets, spreadsheetId, sheetName);
 
   const existingHeader = await sheets.spreadsheets.values.get({
     spreadsheetId,

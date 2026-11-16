@@ -1,181 +1,146 @@
-# صفحة Centre Dermogermany
+# Landing Page – Centre Dermogermany
 
-صفحة هبوط (Landing Page) لسنتر Centre Dermogermany بعين السبع، الدار البيضاء، مبنية بـ **Next.js** (App Router + TypeScript + Tailwind CSS). الصفحة باللغة العربية المغربية، من اليمين لليسار (RTL)، وفيها استمارة متعددة الخطوات كتسجل كل طلب مباشرة فـ Google Sheets عبر نقطة نهاية (API) جانب السيرفر.
+Landing page (Next.js, App Router + TypeScript) pour les publicités Meta/TikTok du Centre Dermogermany (Aïn Sebaâ, Casablanca). Le CTA principal redirige vers WhatsApp après un formulaire de réservation rapide (nom, téléphone, offre, créneau). Chaque soumission est aussi enregistrée silencieusement dans Google Sheets, en parallèle, comme filet de sécurité si WhatsApp ne s'ouvre pas.
 
 ---
 
-## 1. البنية العامة للمشروع
+## 1. Structure du projet
 
 ```
 app/
-  page.tsx                 الصفحة الرئيسية (Header + Hero + الباقات + الاستمارة + Footer)
-  thank-you/page.tsx       صفحة الشكر بعد إرسال الطلب
-  api/submit-lead/route.ts نقطة النهاية جانب السيرفر: فحص المعلومات، تصنيف الطلب، الحفظ فـ Google Sheets
-  layout.tsx                الهيكل العام (RTL، الخط، تفعيل أكواد التتبع)
-  globals.css                الألوان والخط
+  page.tsx                   Rend le composant DermoLanding
+  api/submit-lead/route.ts   Endpoint serveur : valide et enregistre le lead dans Google Sheets
+  layout.tsx                 <html lang="fr" dir="ltr">, polices Google Fonts, Pixels
+  globals.css                Reset minimal (le design de la page vit dans son propre <style>)
 
 components/
-  Header.tsx, Footer.tsx, Hero.tsx, PackagesSection.tsx, HowItWorks.tsx
-  PixelScripts.tsx           كود Meta Pixel و TikTok Pixel (كيتفعل غير إلا كان فيه ID)
-  form/                      الاستمارة متعددة الخطوات (الخطوات، الأسئلة، زرور التالي/رجوع، شريط التقدم)
+  DermoLanding.tsx            Toute la landing page (markup + script, injectés tels quels)
+  PixelScripts.tsx            Code de base Meta Pixel / TikTok Pixel (actif seulement si un ID est configuré)
 
 lib/
-  types.ts                   أنواع المعلومات (TypeScript)
-  options.ts                 الباقات، الأحياء، الأجوبة... (كل النصوص العربية فهاد الملف وفـ المكونات)
-  validation.ts               فحص رقم الهاتف المغربي
-  classifyLead.ts              منطق تصنيف الطلب (جاهزة / خاصها معلومات / اهتمام ضعيف)
-  googleSheets.ts                الاتصال بـ Google Sheets (جانب السيرفر فقط)
-  pixels.ts                      دوال تفعيل Meta Pixel و TikTok Pixel
+  types.ts                    Type du lead WhatsApp
+  validation.ts                Validation/normalisation du numéro marocain
+  googleSheets.ts               Connexion Google Sheets (côté serveur uniquement)
 ```
 
-**مهم:** ما كايناش أي ملف فيه كلمة السر أو المفاتيح السرية فالكود. كلشي كيتقرا من المتغيرات البيئية (Environment Variables) اللي كاينة فـ `.env.local` (محليا) أو فإعدادات الاستضافة (Vercel مثلا).
+**Important :** aucun secret dans le code. Tout passe par des variables d'environnement (`.env.local` en local, Environment Variables sur Vercel).
 
 ---
 
-## 2. التشغيل محليا
+## 2. Lancer en local
 
 ```bash
 npm install
-cp .env.example .env.local   # عمر القيم الحقيقية فـ .env.local
+cp .env.example .env.local   # remplir les vraies valeurs dans .env.local
 npm run dev
 ```
 
-الصفحة كتبان على `http://localhost:3000`.
+La page s'affiche sur `http://localhost:3000`.
 
 ---
 
-## 3. ربط Google Sheets (خطوة بخطوة)
+## 3. Flux de la page
 
-### أ. إنشاء أو اختيار الـ Google Sheet
+1. La visiteuse arrive sur la landing (hero, vidéo, offres, FAQ, carte).
+2. Elle choisit une offre et remplit le formulaire (nom, téléphone, créneau).
+3. Au clic sur "Confirmer" :
+   - Le nom et le téléphone sont validés côté client.
+   - Les événements Pixel (`Lead` Meta, `SubmitForm` TikTok) sont envoyés.
+   - Le lead est envoyé en arrière-plan (sans bloquer) à `/api/submit-lead`, qui le sauvegarde dans Google Sheets.
+   - Après ~700ms, elle est redirigée vers WhatsApp avec un message pré-rempli (offre, nom, téléphone, créneau).
+4. Si WhatsApp ne s'ouvre pas, le bouton "Confirmer sur WhatsApp" reste visible dans l'écran de succès.
 
-1. حلي [sheets.google.com](https://sheets.google.com) وصنعي شيت جديد (أو استعملي شيت كاين).
-2. سمي أول ورقة (Tab) بـ `Leads` (أو سمية آخرى، وغادي تحطيها فـ `GOOGLE_SHEETS_SHEET_NAME`).
-3. خاصك الـ Sheet ID، كاين فـ رابط الشيت:
+Le rendez-vous n'est confirmé que lorsque le centre rappelle/répond sur WhatsApp — la page ne le prétend jamais.
+
+---
+
+## 4. Connecter Google Sheets (étape par étape)
+
+### a. Créer ou choisir le Google Sheet
+
+1. Ouvrez [sheets.google.com](https://sheets.google.com) et créez un Sheet (ou réutilisez l'existant du projet).
+2. Récupérez le **Spreadsheet ID** dans l'URL :
    `https://docs.google.com/spreadsheets/d/XXXXXXXXXXXXXXXXXXXXXXXXXXXX/edit`
-   الجزء `XXXXXXXXXXXXXXXXXXXXXXXXXXXX` هو الـ `GOOGLE_SHEETS_SPREADSHEET_ID`.
 
-> لا داعي لإضافة صف العناوين (Headers) بيديك — الكود كيضيفها وحدو أول مرة كيتسجل فيها طلب فـ ورقة خاوية.
+> Pas besoin de créer l'onglet ni les en-têtes à la main : le code crée automatiquement un onglet **`WhatsAppLeads`** (nom modifiable via `GOOGLE_SHEETS_SHEET_NAME`) avec ses en-têtes, dès le premier lead enregistré. Ça évite tout conflit avec un ancien onglet de leads qui aurait une autre structure.
 
-### ب. إنشاء Service Account (حساب خدمة من Google)
+### b. Service Account Google
 
-1. حلي [Google Cloud Console](https://console.cloud.google.com/).
-2. صنعي مشروع جديد (أو استعملي واحد كاين).
-3. من "APIs & Services" > "Library"، فعلي **Google Sheets API**.
-4. من "APIs & Services" > "Credentials" > "Create Credentials" > **Service Account**.
-5. عمرها بإسم (مثلا `dermo-leads`)، وكملي الإنشاء.
-6. من صفحة الـ Service Account، دخلي لـ "Keys" > "Add Key" > "Create new key" > اختاري **JSON**، وتحمل عندك ملف JSON.
-7. فهاد الملف غادي تلقى:
-   - `client_email` → هو `GOOGLE_SHEETS_CLIENT_EMAIL`
-   - `private_key` → هو `GOOGLE_SHEETS_PRIVATE_KEY` (خليه بكامل السطور، بما فيها `-----BEGIN PRIVATE KEY-----` و `-----END PRIVATE KEY-----`)
+1. [Google Cloud Console](https://console.cloud.google.com/) → créer/choisir un projet.
+2. "APIs & Services" → "Library" → activer **Google Sheets API**.
+3. "APIs & Services" → "Credentials" → "Create Credentials" → **Service Account**.
+4. Dans le Service Account → "Keys" → "Add Key" → "Create new key" → **JSON** → télécharger.
+5. Dans ce fichier JSON :
+   - `client_email` → `GOOGLE_SHEETS_CLIENT_EMAIL`
+   - `private_key` → `GOOGLE_SHEETS_PRIVATE_KEY` (garder `\n` et les lignes `-----BEGIN/END PRIVATE KEY-----`)
 
-### ج. مشاركة الـ Sheet مع Service Account
+### c. Partager le Sheet avec le Service Account
 
-1. رجعي للـ Google Sheet.
-2. دوزي "Share" (مشاركة).
-3. لصقي الإيميل ديال الـ Service Account (`client_email`) وعطيها صلاحية **Editor**.
-4. بدون هاد الخطوة، الكود ما غاديش يقدر يكتب فالشيت.
+Dans le Google Sheet → "Share" → coller l'email du Service Account → rôle **Editor**.
 
-### د. تعمير المتغيرات البيئية
-
-محليا، فملف `.env.local` (ماشي `.env.example`):
+### d. Variables d'environnement
 
 ```
 GOOGLE_SHEETS_SPREADSHEET_ID=...
 GOOGLE_SHEETS_CLIENT_EMAIL=...
 GOOGLE_SHEETS_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
-GOOGLE_SHEETS_SHEET_NAME=Leads
+GOOGLE_SHEETS_SHEET_NAME=WhatsAppLeads
 ```
 
-فـ Vercel (أو أي استضافة آخرى): Project Settings > Environment Variables، وزيدي نفس المتغيرات الأربعة لـ Production (و Preview إلا بغيتي).
+À ajouter dans `.env.local` en local, et dans Vercel → Project Settings → Environment Variables (Production).
 
-> `GOOGLE_SHEETS_PRIVATE_KEY` خاصها تبقى بـ `\n` كيما هي (ماشي أسطر حقيقية) إلا كنتي كتلصقها فـ Vercel كقيمة واحدة؛ الكود كيتعامل مع الحالتين.
+### e. Déployer et vérifier
 
-### هـ. النشر (Deploy) والتأكد
+1. Push sur `main` (déploiement automatique si le repo GitHub est connecté à Vercel).
+2. Remplir le formulaire sur le site en ligne.
+3. Vérifier que WhatsApp s'ouvre bien, et qu'une ligne apparaît dans l'onglet `WhatsAppLeads` du Sheet.
 
-1. انشري المشروع (مثلا على Vercel: `vercel --prod` أو عبر الربط بـ GitHub).
-2. تأكدي أن المتغيرات البيئية الأربعة مزيدين فـ الاستضافة.
-3. دخلي للصفحة المنشورة، عمري الاستمارة بمعلومات تجريبية، وصيفطي الطلب.
-4. حلي الـ Google Sheet وتأكدي أن صف جديد ظهر (مع صف العناوين أول مرة).
-
-إلا ما ظهرش الصف: شوفي الـ logs ديال الاستضافة (مثلا Vercel > Deployments > Logs) — رسالة الخطأ غادي تبين شنو ناقص (Sheet ID؟ الصلاحية؟ المفتاح؟).
+Si la ligne n'apparaît pas : voir Vercel → Deployments → Logs, le message d'erreur indique ce qui manque (ID, partage, clé...).
 
 ---
 
-## 4. أعمدة الشيت
+## 5. Colonnes du Sheet
 
-كل طلب كيتسجل كصف وحد، بهاد الترتيب:
-
-| العمود | المعنى |
+| Colonne | Contenu |
 |---|---|
-| تاريخ ووقت الطلب | بتوقيت الدار البيضاء |
-| الاسم | الاسم الشخصي |
-| رقم الهاتف | بصيغة `+212...` |
-| الباقة المختارة | |
-| اختيار المنطقة الواحدة، إلا كان مناسباً | غير إلا اختارت "منطقة واحدة" |
-| الحي | |
-| وقت البدء | |
-| نية التواصل | |
-| القدرة على المجيء للسنتر | |
-| الوقت المناسب للاتصال | |
-| الموافقة على التواصل | |
-| حالة الطلب | مهتمة وجاهزة للاتصال / خاصها معلومات أكثر / اهتمام ضعيف أو خارج المنطقة |
-| سبب تصنيف الطلب | شرح قصير لليه تصنف الطلب هكا |
+| تاريخ ووقت الطلب | Horodatage (heure de Casablanca) |
+| الاسم | Nom |
+| رقم الهاتف | Format `+212...` |
+| العرض المختار | Nom de l'offre choisie |
+| الوقت المفضل للاتصال | Créneau sélectionné |
+| مصدر الطلب | `"Landing Meta Ads"` |
 | مصدر الإعلان UTM | `utm_source` |
 | الحملة الإعلانية | `utm_campaign` |
 | الإعلان | `utm_content` |
-| رابط الصفحة ومصدر الزيارة | الرابط اللي زارت منه الصفحة + referrer |
+| رابط الصفحة ومصدر الزيارة | URL de la page + referrer |
 
-**كل الطلبات الصحيحة كيتسجلو، حتى الطلبات ديال "اهتمام ضعيف / خارج المنطقة"** — باش الفريق يقدر يراجعها بيديه إلا بان فيها فرصة.
-
----
-
-## 5. Meta Pixel و TikTok Pixel
-
-الصفحة خدامة بشكل كامل حتى بلا Pixel IDs. ملي توصلك الـ IDs:
-
-1. زيديهم فـ `.env.local` محليا، وفـ Environment Variables فالاستضافة:
-   ```
-   NEXT_PUBLIC_META_PIXEL_ID=xxxxxxxxxxxxxxx
-   NEXT_PUBLIC_TIKTOK_PIXEL_ID=XXXXXXXXXXXXXXXXXXXX
-   ```
-2. ما كاين شي تعديل آخر فالكود — `components/PixelScripts.tsx` كيقرا هاد المتغيرات وحدو.
-
-**شنو كيتبعت للـ Pixels:**
-- عند فتح الصفحة: `PageView` (Meta) و `page()` (TikTok) — تلقائي من كود التفعيل نفسه.
-- عند نجاح إرسال الاستمارة (من بعد ما يتسجل الطلب فـ Google Sheets بنجاح): `Lead` (Meta) و `SubmitForm` (TikTok).
-- إلا كان تصنيف الطلب "مهتمة وجاهزة للاتصال": كيتبعت event زائد `QualifiedLead` (Meta و TikTok).
-
-**ما كايتبعتش للـ Pixels:** الاسم، رقم الهاتف، الباقة، الحي، ولا أي جواب آخر ديال الاستمارة — غير اسم الـ event.
-
-الكود موجود فـ:
-- `components/PixelScripts.tsx` (تفعيل الـ base code ديال كل Pixel)
-- `lib/pixels.ts` (الدوال اللي كتصيفط الـ events)
-- `components/form/LeadForm.tsx` (فين كيتصيفطو الـ events من بعد النجاح)
+Un lead qui ne sauvegarde pas (Sheets indisponible) n'empêche jamais la redirection WhatsApp — c'est volontairement un filet de sécurité en parallèle, pas un blocage.
 
 ---
 
-## 6. منطق تصنيف الطلب
+## 6. Meta Pixel & TikTok Pixel
 
-موجود فـ `lib/classifyLead.ts`:
+Déjà configuré et testé (Pixel ID `364046702808936`). Pour changer ou ajouter le TikTok Pixel :
 
-- **اهتمام ضعيف / خارج المنطقة**: إلا قالت "ما بغيتش يتاصلوا بيا"، أو "لا" على سؤال القدرة على المجيء، أو ساكنة "خارج الدار البيضاء".
-- **مهتمة وجاهزة للاتصال**: اختارت باقة محددة (ماشي "مازال ما عرفتش")، وبغات التواصل بخصوص الموعد، وبغات تبدا هاد السيمانة أو هاد الشهر، وأكدت أنها تقدر تجي للسنتر.
-- **خاصها معلومات أكثر**: كل الحالات الباقية.
+```
+NEXT_PUBLIC_META_PIXEL_ID=...
+NEXT_PUBLIC_TIKTOK_PIXEL_ID=...
+```
+
+Événements envoyés :
+- `PageView` (Meta) / page view (TikTok) — au chargement, automatique.
+- `ViewContent` — au chargement, et à la lecture de la vidéo.
+- `InitiateCheckout` — à la sélection d'une offre.
+- `Lead` (Meta) / `SubmitForm` (TikTok) — à la soumission du formulaire.
+- `Contact` (Meta) / `Contact` (TikTok) — au clic sur un bouton WhatsApp.
+
+Aucune donnée personnelle (nom, téléphone) n'est envoyée aux Pixels — uniquement le nom de l'offre et sa valeur.
 
 ---
 
-## 7. حدود وملاحظات مهمة
+## 7. À fournir / vérifier
 
-- الصفحة ما كتأكدش أي موعد — غير الفريق هو اللي كيأكد من بعد ما يتصل.
-- عدد الجلسات مذكور فكل باقة (جلسة واحدة للباقة الأولى، 7 جلسات للباقات الأخرى).
-- رقم الهاتف كيتأكد بصيغ: `06XXXXXXXX`، `07XXXXXXXX`، `+2126...`، `+212 7...`.
-- إلا فشل الحفظ فـ Google Sheets، الاستمارة كتبقى بأجوبتها، وكتبان رسالة خطأ واضحة بالعربية باش تعاود المحاولة — ما كتبانش صفحة الشكر حتى يتأكد الحفظ.
-
----
-
-## 8. شنو خاص المسؤول عن السنتر يوفر (ما كنقدرش نكملو بلاه)
-
-1. **لوغو السنتر الحقيقي** — دابا الهيدر فيه رمز مؤقت (دائرة "DG"). ملي توصل صورة اللوغو، خاصها تحط فـ `public/` وتربط فـ `components/Header.tsx` و `components/Footer.tsx`.
-2. **حساب Google و Service Account** — خاص صاحب الحساب (أو شي واحد عندو صلاحية) يتبع الخطوات فالفصل 3.
-3. **Meta Pixel ID و TikTok Pixel ID** — غادي نزيدهم ملي توصلو، بلا أي تعديل آخر فالكود.
-4. **اسم النطاق (Domain) والاستضافة النهائية** إلا بغيتي دومين خاص بسنتر Dermogermany.
+1. **Vidéo et image poster** : `components/DermoLanding.tsx` pointe vers `/dermogermany-video-web.mp4` et `/dermogermany-poster.jpg`. Déposez ces deux fichiers dans le dossier `public/` du projet (même nom exact) et ils s'afficheront automatiquement, sans toucher au code.
+2. **Adresse et horaires du centre** : le texte actuel ("Lotissement Al Amane 4, Immeuble 187, Appt 3, Aïn Sebaâ" / "Lundi au Samedi 10h–20h") vient du fichier que vous avez fourni — à vérifier que c'est bien exact avant de lancer les publicités.
+3. **Zones comprises dans "corps complet"** (FAQ) : texte générique à confirmer/adapter avec la liste exacte du centre.
+4. **Numéro WhatsApp** : `212601561726`, déjà en place dans le code.

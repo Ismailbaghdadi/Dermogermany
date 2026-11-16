@@ -1,18 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Cairo } from "next/font/google";
 import "./globals.css";
 import PixelScripts from "@/components/PixelScripts";
 
-const cairo = Cairo({
-  subsets: ["arabic", "latin"],
-  variable: "--font-cairo",
-  weight: ["400", "500", "600", "700", "800"],
-});
-
 export const metadata: Metadata = {
-  title: "Centre Dermogermany — إزالة الشعر بالليزر بعين السبع، الدار البيضاء",
+  title: "Épilation Laser – Centre Dermogermany, Aïn Sebaâ Casablanca",
   description:
-    "اطلبي معلومات أو موعد لإزالة الشعر بالليزر بتقنية COCOON MEDICAL PrimeLase فسنتر Centre Dermogermany بعين السبع، الدار البيضاء.",
+    "Épilation laser définitive au Centre Dermogermany, Aïn Sebaâ, Casablanca. Réservez votre diagnostic gratuit dès maintenant.",
 };
 
 export const viewport: Viewport = {
@@ -24,8 +17,16 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ar" dir="rtl" className={cairo.variable}>
-      <body className="min-h-screen bg-background text-foreground antialiased">
+    <html lang="fr" dir="ltr">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Cairo:wght@600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="min-h-screen antialiased">
         <PixelScripts />
         {children}
       </body>

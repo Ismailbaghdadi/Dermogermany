@@ -198,39 +198,7 @@ const MARKUP = `
     </div>
   </section>
 
-  <section class="alt" id="dg-offres">
-    <div class="wrap">
-      <h2>Choisissez votre offre</h2>
-      <p class="lead">Les 2 offres présentées dans la vidéo, sans surprise.</p>
-      <div class="offers">
-
-        <div class="offer star reveal" data-offer="pack" tabindex="0">
-          <span class="ribbon">⭐ LE PLUS CHOISI</span>
-          <span class="tag">Offre Star • Best-seller</span>
-          <h3>Pack Corps Complet — 10 Séances</h3>
-          <div class="price"><b>5 000 DH</b><s>10 000 DH</s></div>
-          <ul>
-            <li>✅ Toutes les zones du corps incluses</li>
-            <li>✅ 10 séances corps complet (500 DH la séance)</li>
-            <li>✅ Diagnostic de peau offert</li>
-            <li>✅ Laser Diode médical, confortable &amp; sécurisé</li>
-          </ul>
-          <button type="button" class="btn btn-light pick">Je choisis le Pack →</button>
-        </div>
-
-        <div class="offer reveal" data-offer="decouverte" tabindex="0">
-          <span class="tag">Offre Découverte</span>
-          <h3>Séance Promo Découverte</h3>
-          <div class="price"><b>200 DH</b></div>
-          <p class="desc">Idéal pour tester l'efficacité et le confort de notre laser sur une zone au choix. <b style="color:var(--pink)">Places limitées.</b></p>
-          <button type="button" class="btn btn-light pick">Je teste à 200 DH →</button>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <section id="dg-form">
+  <section class="alt" id="dg-form">
     <div class="wrap">
       <h2>Réservez en 30 secondes</h2>
       <p class="lead">Nous vous rappelons pour confirmer votre créneau. <span class="ar">بلا خلاص أونلاين</span></p>
@@ -285,6 +253,38 @@ const MARKUP = `
           <p style="color:var(--muted);font-size:14.5px;margin:0 0 14px">Nous ouvrons WhatsApp pour confirmer votre créneau. Si rien ne s'ouvre, appuyez ci-dessous.</p>
           <a href="#" class="btn btn-wa" id="dg-success-wa" target="_blank" rel="noopener">📲 Confirmer sur WhatsApp</a>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="dg-offres">
+    <div class="wrap">
+      <h2>Choisissez votre offre</h2>
+      <p class="lead">Les 2 offres présentées dans la vidéo, sans surprise.</p>
+      <div class="offers">
+
+        <div class="offer star reveal" data-offer="pack" tabindex="0">
+          <span class="ribbon">⭐ LE PLUS CHOISI</span>
+          <span class="tag">Offre Star • Best-seller</span>
+          <h3>Pack Corps Complet — 10 Séances</h3>
+          <div class="price"><b>5 000 DH</b><s>10 000 DH</s></div>
+          <ul>
+            <li>✅ Toutes les zones du corps incluses</li>
+            <li>✅ 10 séances corps complet (500 DH la séance)</li>
+            <li>✅ Diagnostic de peau offert</li>
+            <li>✅ Laser Diode médical, confortable &amp; sécurisé</li>
+          </ul>
+          <button type="button" class="btn btn-light pick">Je choisis le Pack →</button>
+        </div>
+
+        <div class="offer reveal" data-offer="decouverte" tabindex="0">
+          <span class="tag">Offre Découverte</span>
+          <h3>Séance Promo Découverte</h3>
+          <div class="price"><b>200 DH</b></div>
+          <p class="desc">Idéal pour tester l'efficacité et le confort de notre laser sur une zone au choix. <b style="color:var(--pink)">Places limitées.</b></p>
+          <button type="button" class="btn btn-light pick">Je teste à 200 DH →</button>
+        </div>
+
       </div>
     </div>
   </section>

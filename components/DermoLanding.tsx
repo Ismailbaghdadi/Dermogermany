@@ -180,13 +180,6 @@ const MARKUP = `
       <p class="sub">Au lieu de 1 000 DH la séance corps complet : vos 10 séances reviennent à 500 DH seulement, avec notre laser médical Diode haute performance.</p>
       <p class="dj ar">حجزي دابا وخلّصي فالمركز ✨</p>
 
-      <span class="video-tag">▶️ Regardez l'offre en 20 secondes</span>
-      <div class="video-box">
-        <video id="dg-video" controls playsinline preload="metadata" poster="/dermogermany-poster.jpg">
-          <source src="/dermogermany-video-web.mp4" type="video/mp4">
-        </video>
-      </div>
-
       <div class="cta-stack">
         <a href="#dg-form" class="btn btn-gold js-scroll" data-offer="pack">👇 Réserver mon offre maintenant</a>
         <a href="#" class="btn btn-wa pulse js-wa" target="_blank" rel="noopener">
@@ -253,6 +246,17 @@ const MARKUP = `
           <p style="color:var(--muted);font-size:14.5px;margin:0 0 14px">Nous ouvrons WhatsApp pour confirmer votre créneau. Si rien ne s'ouvre, appuyez ci-dessous.</p>
           <a href="#" class="btn btn-wa" id="dg-success-wa" target="_blank" rel="noopener">📲 Confirmer sur WhatsApp</a>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="text-align:center">
+    <div class="wrap">
+      <span class="video-tag">▶️ Regardez l'offre en 20 secondes</span>
+      <div class="video-box">
+        <video id="dg-video" controls playsinline preload="metadata" poster="/dermogermany-poster.jpg">
+          <source src="/dermogermany-video-web.mp4" type="video/mp4">
+        </video>
       </div>
     </div>
   </section>
